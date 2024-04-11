@@ -1,0 +1,23 @@
+{
+  "name": "client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start:zkp": "anvil -a 20",
+    "deploy:contracts": "cd packages/zkp && forge script script/Deploy.s.sol --fork-url http://127.0.0.1:8545 --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 --broadcast && forge script script/BatchRegister.s.sol --fork-url http://127.0.0.1:8545 --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 --broadcast && forge script script/SubmitProposal.s.sol --fork-url http://127.0.0.1:8545 --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 --broadcast",
+    "build:client": "pnpm --filter client build",
+    "build:server": "pnpm --filter server build",
+    "start:client": "pnpm --filter client start",
+    "start:server": "pnpm --filter server start",
+    "deploy": "pnpm run build && pnpm run start",
+    "build": "pnpm run build:server && pnpm run build:client",
+    "start": "concurrently \"pnpm:start:server\" \"pnpm:start:client\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
