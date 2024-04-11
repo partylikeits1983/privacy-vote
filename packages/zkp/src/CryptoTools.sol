@@ -30,6 +30,11 @@ contract CryptoTools {
         return false;
     }
 
+    function getCurrentRoot() public view returns (uint256) {
+        return roots[currentRootIndex];
+    }
+
+
     function lastSubtrees(uint256 index) public view returns (uint256[2] memory) {
         return binaryIMTData.lastSubtrees[index];
     }
@@ -39,19 +44,16 @@ contract CryptoTools {
         return PoseidonT3.hash(input);
     }
 
-    function insert(uint256 leaf) public returns (uint256) {
+    function _insert(uint256 leaf) internal returns (uint256 root, uint256 index) {
         require(nextIndex < 2 ** 32, "Merkle tree is full. No more leaves can be added");
 
-        uint256 root = InternalBinaryIMT._insert(binaryIMTData, leaf);
+        root = InternalBinaryIMT._insert(binaryIMTData, leaf);
         uint32 newRootIndex = (currentRootIndex + 1) % ROOT_HISTORY_SIZE;
         currentRootIndex = newRootIndex;
         roots[newRootIndex] = root;
         nextIndex++;
 
-        console.log("ROOT INSERT");
-        console.log(root);
-
-        return root;
+        return (root, nextIndex - 1);
     }
 
     function verifyLeaf(uint256 leaf, uint256[] calldata proofSiblings, uint8[] calldata proofPathIndices)

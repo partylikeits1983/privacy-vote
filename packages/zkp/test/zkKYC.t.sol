@@ -54,7 +54,7 @@ contract zkKYCTest is Test, ConvertBytes32ToString {
         uint256 commitmentHash = PoseidonT3.hash([nulifier, secret]);
         uint256 nulifierHash = PoseidonT3.hash([nulifier, proposalId]);
 
-        uint256 root = zkKYC.insert(commitmentHash);
+        (uint256 root,) = zkKYC.insert(commitmentHash);
 
         (uint256[] memory proofSiblings, uint8[] memory proofPathIndices) = zkKYC.createProof(0);
 

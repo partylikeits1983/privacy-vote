@@ -23,8 +23,6 @@ struct Proposal {
 }
 
 contract ZK_KYC is CryptoTools {
-    string public sanityCheck = "ZK_KYC is deployed";
-
     /// @dev  username string => UserInfo
     mapping(string username => UserInfo) public userData;
 
@@ -42,6 +40,11 @@ contract ZK_KYC is CryptoTools {
 
     /// @dev address verifier
     UltraVerifier public verifier;
+
+    event UsersRegistered(uint256[] leafIndices);
+    event ProposalCreated(uint256 proposalId);
+    event ProposalVoted(uint256 proposalId, uint256 voteType);
+    event UserRegistered(string username);
 
     modifier onlyAdmin() {
         require(msg.sender == admin, "Only owner can call this function");
@@ -88,17 +91,24 @@ contract ZK_KYC is CryptoTools {
         } else {
             userData[username].isAuthenticated = true;
             userData[username].commitmentId = nextIndex;
-            insert(userData[username].commitment);
+            _insert(userData[username].commitment);
+            emit UserRegistered(username);
         }
+    }
+
+    function insert(uint256 leaf) external onlyAdmin returns (uint256, uint256) {
+        return _insert(leaf);
     }
 
     // @dev admin can register multiple users
     function registerMultipleUsers(string[] memory usernames, address[] memory addresses, uint256[] memory commitments)
         external
         onlyAdmin
+        returns (uint256[] memory leafIndices)
     {
         require(usernames.length == commitments.length, "Invalid input length");
 
+        leafIndices = new uint256[](usernames.length);
         for (uint256 i = 0; i < usernames.length; i++) {
             string memory username = usernames[i];
             address user = addresses[i];
@@ -108,11 +118,14 @@ contract ZK_KYC is CryptoTools {
 
             if (bytes(userInfo.username).length == 0) {
                 userData[username] = UserInfo(user, username, commitment, nextIndex, true);
-                insert(commitment);
+                (, uint256 leafIndex) = _insert(commitment);
+                leafIndices[i] = leafIndex;
             } else {
                 revert("user already exists");
             }
         }
+        emit UsersRegistered(leafIndices);
+        return leafIndices;
     }
 
     /// @dev create proposal
@@ -123,6 +136,7 @@ contract ZK_KYC is CryptoTools {
 
         proposals[currentProposalId] = Proposal(description, 0, 0, 0, block.timestamp, false, data);
 
+        emit ProposalCreated(currentProposalId);
         currentProposalId++;
     }
 
@@ -153,6 +167,7 @@ contract ZK_KYC is CryptoTools {
         } else {
             proposals[proposalId].votesAgainst += 1;
         }
+        emit ProposalVoted(proposalId, voteType);
     }
 
     /// @dev Batch vote on proposals
@@ -184,6 +199,7 @@ contract ZK_KYC is CryptoTools {
             } else {
                 proposals[proposalId].votesAgainst += 1;
             }
+            emit ProposalVoted(proposalId, voteType);
         }
     }
 }

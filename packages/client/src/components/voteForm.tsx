@@ -56,7 +56,8 @@ const VoteForm: React.FC<VoteFormProps> = ({ username }) => {
 
   const fetchVoteData = async () => {
     try {
-      const data = await getVoteData(walletProvider);
+      const proposalId = 0;
+      const data = await getVoteData(walletProvider, proposalId);
       setVoteData(data);
     } catch (error) {
       console.error('Failed to fetch vote data:', error);
@@ -78,7 +79,15 @@ const VoteForm: React.FC<VoteFormProps> = ({ username }) => {
       setIsSubmitting(true);
       setCountdown(160); // Start the countdown from 2 minutes and 40 seconds
 
-      const pushPromise = generateProof();
+      const proposalId = 0;
+      const voteType = voteChoice === 'for' ? 1 : 0;
+
+      const pushPromise = generateProof(
+        walletProvider,
+        username,
+        proposalId,
+        voteType,
+      );
       const timerPromise = new Promise((resolve) =>
         setTimeout(resolve, 150000),
       ); // 2 minutes and 30 seconds
