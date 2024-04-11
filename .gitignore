@@ -16,3 +16,11 @@ playground-temp
 temp
 TODOs.md
 .eslintcache
+
+cache/
+out/
+!/broadcast
+/broadcast/*/31337/
+/broadcast/**/dry-run/
+docs/
+.env

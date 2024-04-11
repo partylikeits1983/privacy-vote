@@ -23,18 +23,19 @@ const MainForm: React.FC<MainFormProps> = ({
 }) => {
   return (
     <VStack spacing={4}>
-<ToastContainer
-position="top-right"
-autoClose={5000}
-hideProgressBar={false}
-newestOnTop={false}
-closeOnClick
-rtl={false}
-pauseOnFocusLoss
-draggable
-pauseOnHover
-theme="light"
-/>      <Heading size="lg" color="white">
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />{' '}
+      <Heading size="lg" color="white">
         Privacy Vote with WebAuthn
       </Heading>
       {!isAuthenticated ? (
@@ -58,7 +59,6 @@ theme="light"
       ) : (
         <Text color="white">Logged in as {username}</Text>
       )}
-
       {isAuthenticated && (
         <Button
           colorScheme="green"
@@ -69,7 +69,6 @@ theme="light"
           Request KYC
         </Button>
       )}
-
       {isAuthenticated && <Text color="white">User is authenticated</Text>}
     </VStack>
   );

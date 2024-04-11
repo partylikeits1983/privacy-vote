@@ -21,9 +21,6 @@ contract ZK_KYC_DEPLOY is Script {
         // set verifier
         zkKYC.setVerifier(address(verifier));
 
-
-        
-
         vm.stopBroadcast();
     }
 }

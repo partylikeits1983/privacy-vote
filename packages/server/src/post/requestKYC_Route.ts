@@ -43,11 +43,13 @@ requestKYC_Route.post("/request-kyc", async (req, res) => {
         userAddresses,
         commitmentHashes,
       );
+
+      res.json({ sucess: true });
+
     } catch (error) {
       console.error("Error fetching proposal data:", error);
+      res.json({ sucess: false });
     }
-
-    res.json({ data: userData });
   }
 });
 

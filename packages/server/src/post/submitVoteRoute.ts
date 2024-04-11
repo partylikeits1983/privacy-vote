@@ -53,6 +53,8 @@ submitVoteRoute.post("/vote", async (req, res) => {
       publicInputs.voteType,
     ];
 
+    console.log("PUBLIC INPUTS", publicInputsArray)
+
     try {
       await zkKYC.vote(proofBytes, publicInputsArray);
       res.json({ success: true });

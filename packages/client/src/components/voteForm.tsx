@@ -9,7 +9,11 @@ import {
   Select,
   CircularProgress,
 } from '@chakra-ui/react';
-import { getVoteData, authenticateUser, generateProof } from '../utils/webAuthn';
+import {
+  getVoteData,
+  authenticateUser,
+  generateProof,
+} from '../utils/webAuthn';
 import {} from '@web3modal/ethers/react';
 
 import {
@@ -65,34 +69,35 @@ const VoteForm: React.FC<VoteFormProps> = ({ username }) => {
     // Wait for the authentication result and proceed only if it returns true
     const isAuthenticated = await authenticateUser(username);
     if (!isAuthenticated) {
-        setSubmissionMessage('Enter username');
-        setIsSubmitting(false); // Update the submission state to false as the process halts here
-        return; // Exit the function early since the user is not authenticated
+      setSubmissionMessage('Enter username');
+      setIsSubmitting(false); // Update the submission state to false as the process halts here
+      return; // Exit the function early since the user is not authenticated
     }
 
     try {
-        setIsSubmitting(true);
-        setCountdown(160); // Start the countdown from 2 minutes and 40 seconds
+      setIsSubmitting(true);
+      setCountdown(160); // Start the countdown from 2 minutes and 40 seconds
 
-        const pushPromise = generateProof();
-        const timerPromise = new Promise((resolve) => setTimeout(resolve, 150000)); // 2 minutes and 30 seconds
+      const pushPromise = generateProof();
+      const timerPromise = new Promise((resolve) =>
+        setTimeout(resolve, 150000),
+      ); // 2 minutes and 30 seconds
 
-        const result = await Promise.race([pushPromise, timerPromise]);
+      const result = await Promise.race([pushPromise, timerPromise]);
 
-        if (result) {
-            setSubmissionMessage('Proof generation success');
-        } else {
-            // If the pushVoteData finishes after the timer, consider it as unsuccessful.
-            setSubmissionMessage('Proof generation timed out');
-        }
+      if (result) {
+        setSubmissionMessage('Proof generation success');
+      } else {
+        // If the pushVoteData finishes after the timer, consider it as unsuccessful.
+        setSubmissionMessage('Proof generation timed out');
+      }
     } catch (error) {
-        console.error('Failed to submit vote:', error);
-        setSubmissionMessage('An error occurred');
+      console.error('Failed to submit vote:', error);
+      setSubmissionMessage('An error occurred');
     } finally {
-        setIsSubmitting(false);
+      setIsSubmitting(false);
     }
-};
-
+  };
 
   const formatCountdown = () => {
     const minutes = Math.floor(countdown / 60);

@@ -5,7 +5,8 @@ This repository is a basic demonstration of the Noir zk-circuit language, the We
 
 ### Running 
 ```
-pnpm i 
+pnpm i
+pnpm build 
 ```
 
 ```
@@ -15,6 +16,5 @@ pnpm start:zkp
 In a new terminal:
 ```
 pnpm deploy:contracts
-pnpm build
 pnpm start
 ```

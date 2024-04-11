@@ -93,14 +93,11 @@ contract ZK_KYC is CryptoTools {
     }
 
     // @dev admin can register multiple users
-    function registerMultipleUsers(
-        string[] memory usernames,
-        address[] memory addresses,
-        uint256[] memory commitments
-    ) external onlyAdmin {
-        require(
-            usernames.length == commitments.length, "Invalid input length"
-        );
+    function registerMultipleUsers(string[] memory usernames, address[] memory addresses, uint256[] memory commitments)
+        external
+        onlyAdmin
+    {
+        require(usernames.length == commitments.length, "Invalid input length");
 
         for (uint256 i = 0; i < usernames.length; i++) {
             string memory username = usernames[i];

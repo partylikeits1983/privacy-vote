@@ -5,7 +5,7 @@ import cors from "cors"; // Import cors
 import statusRoute from "./get/statusRoute";
 
 // post methods
-import requestKYC_ROUTE from "./post/requestKYC_Route";
+import requestKYC_Route from "./post/requestKYC_Route";
 import submitVoteRoute from "./post/submitVoteRoute";
 
 const app = express();
@@ -18,11 +18,11 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.send("Hello, world!");
+  res.send("/zk-kyc api status nominal");
 });
 
 app.use(statusRoute);
-app.use(requestKYC_ROUTE);
+app.use(requestKYC_Route);
 app.use(submitVoteRoute);
 
 app.listen(PORT, () => {

@@ -22,8 +22,6 @@ contract ZK_KYC_DEPLOY is Script {
         usernames[1] = "bob";
         usernames[2] = "eve";
 
-
-
         uint256[] memory commitments = new uint256[](3);
         commitments[0] = 0x2098f5fb9e239eab3ceac3f27b81e481dc3124d55ffed523a839ee8446b64864;
         commitments[1] = 1;
