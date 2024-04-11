@@ -9,17 +9,21 @@ import {
   Select,
   CircularProgress,
 } from '@chakra-ui/react';
+
+import { ethers, BrowserProvider } from 'ethers';
 import {
   getVoteData,
   authenticateUser,
   generateProof,
 } from '../utils/webAuthn';
 import {} from '@web3modal/ethers/react';
+import { toast } from 'react-toastify';
 
-import {
-  useWeb3ModalAccount,
-  useWeb3ModalProvider,
-} from '@web3modal/ethers/react';
+import { useWeb3ModalProvider } from '@web3modal/ethers/react';
+
+const ZK_KYCABI = require('../abi/ZK_KYC.json').abi;
+const WebAuthnAddress = '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512';
+
 interface VoteFormProps {
   username: string;
 }
@@ -37,8 +41,55 @@ const VoteForm: React.FC<VoteFormProps> = ({ username }) => {
 
   // Fetch vote data when component mounts
   useEffect(() => {
+    const fetchVoteData = async () => {
+      try {
+        // Example: Fetching initial vote data
+        const proposalId = 0; // Example proposal ID
+        const data = await getVoteData(walletProvider, proposalId);
+        setVoteData(data);
+
+        // Set up a listener for the ProposalVoted event if the walletProvider is available
+        if (walletProvider) {
+          const ethersProvider = new BrowserProvider(walletProvider);
+          const signer = await ethersProvider.getSigner();
+
+          const zkKYC = new ethers.Contract(WebAuthnAddress, ZK_KYCABI, signer);
+
+          const onVote = (proposalId: bigint, voteType: bigint) => {
+            console.log(
+              `New vote for proposalId: ${proposalId} with voteType: ${voteType}`,
+            );
+
+            // Use an IIFE (Immediately Invoked Function Expression) to handle async operations
+            (async () => {
+              try {
+                // This ensures that you are within an async context and can use await
+                const data = await getVoteData(
+                  walletProvider,
+                  Number(proposalId),
+                );
+                setVoteData(data); // Update your component's state with the new vote data
+              } catch (error) {
+                console.error('Failed to fetch vote data:', error);
+              }
+            })();
+          };
+
+          // Listen for the ProposalVoted event
+          zkKYC.on('ProposalVoted', onVote);
+
+          // Clean up the listener when the component unmounts or the walletProvider changes
+          return () => {
+            zkKYC.off('ProposalVoted', onVote);
+          };
+        }
+      } catch (error) {
+        console.error('Failed to fetch vote data:', error);
+      }
+    };
+
     fetchVoteData();
-  }, [walletProvider]);
+  }, [walletProvider]); // Dependency array includes walletProvider
 
   useEffect(() => {
     // Declare 'timer' with a type that is suitable for both browser and Node.js environments.
@@ -53,16 +104,6 @@ const VoteForm: React.FC<VoteFormProps> = ({ username }) => {
     // The cleanup function to clear the timeout
     return () => clearTimeout(timer);
   }, [isSubmitting, countdown]);
-
-  const fetchVoteData = async () => {
-    try {
-      const proposalId = 0;
-      const data = await getVoteData(walletProvider, proposalId);
-      setVoteData(data);
-    } catch (error) {
-      console.error('Failed to fetch vote data:', error);
-    }
-  };
 
   const submitVote = async () => {
     setSubmissionMessage(''); // Clear any previous messages
@@ -97,8 +138,9 @@ const VoteForm: React.FC<VoteFormProps> = ({ username }) => {
       if (result) {
         setSubmissionMessage('Proof generation success');
       } else {
-        // If the pushVoteData finishes after the timer, consider it as unsuccessful.
-        setSubmissionMessage('Proof generation timed out');
+        toast.error('Please hold on, proof generation in');
+        setCountdown(45);
+        setSubmissionMessage('proof generation is taking longer than expected');
       }
     } catch (error) {
       console.error('Failed to submit vote:', error);
